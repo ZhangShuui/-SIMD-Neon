@@ -6,7 +6,7 @@ using namespace std;
 const int maxN = 6000;
 float Data[maxN][maxN];
 struct timeval start,ending;
-int n = 0;
+int n = 20;
 void init(){
     for(int i=0;i<n;i++){
         for(int j=0;j<n;j++){
@@ -17,31 +17,35 @@ void init(){
 void GaussElimi(){
     float32x4_t vt,va,vaji,vaik,vajk,vx;
     for (int i = 0; i < n - 1; ++i) {
-        vt = vld1q_dup_f32(Data[i]+i);
+        float xx=1.0/Data[i][i];
+        vt = vld1q_dup_f32(&xx);
         for (int j = i+1; j+4 <= n-1; j+=4) {
             va = vld1q_f32(Data[i]+j);
-            va = vdivq_f32(va,vt);
+            va = vmulq_f32(va,vt);
             vst1q_f32(Data[i]+j,va);
         }
         for (int j = n-n%4; j < n; ++j) {
             Data[i][j]/=Data[i][i];
+
         }
         Data[i][i] = 1.0;
-        for (int j = i+1; j <= n-1; ++j) {
-            vaji = vld1q_dup_f32(Data[j]+i);
-            for (int k = i+1; k+4 <= n-1 ; k+=4) {
-                vaik = vld1q_f32(Data[i]+k);
-                vajk = vld1q_f32(Data[j]+k);
-                vx = vmulq_f32(vaik,vaji);
-                vajk = vsubq_f32(vajk,vx);
-                vst1q_f32(Data[j]+k,vajk);
-            }
-            for (int k = n-n%4; k < n; ++k) {
-                Data[j][k] = Data[j][k] - Data[i][k]*Data[j][i];
-            }
-            Data[j][i] = 0.0;
-        }
     }
+    Data[i][i] = 1.0;
+    for (int j = i+1; j <= n-1; ++j) {
+        vaji = vld1q_dup_f32(Data[j]+i);
+        for (int k = i+1; k+4 <= n-1 ; k+=4) {
+            vaik = vld1q_f32(Data[i]+k);
+            vajk = vld1q_f32(Data[j]+k);
+            vx = vmulq_f32(vaik,vaji);
+            vajk = vsubq_f32(vajk,vx);
+            vst1q_f32(Data[j]+k,vajk);
+        }
+        for (int k = n-n%4; k < n; ++k) {
+            Data[j][k] = Data[j][k] - Data[i][k]*Data[j][i];
+        }
+        Data[j][i] = 0.0;
+    }
+}
 }//不对齐
 void display(){
     for (int i = 0; i < n; ++i) {
