@@ -17,9 +17,9 @@ void init(){
 void GaussElimi(){
     float32x4_t vt,va,vaji,vaik,vajk,vx;
     for (int i = 0; i < n - 1; ++i) {
-        vt = vldlq_dup_f32(Data[i]+i);
+        vt = vld1q_dup_f32(Data[i]+i);
         for (int j = i+1; j+4 <= n-1; j+=4) {
-            va = vldlq_f32(Data[i]+j);
+            va = vld1q_f32(Data[i]+j);
             va = vdivq_f32(va,vt);
             vst1q_f32(Data[i]+j,va);
         }
@@ -28,10 +28,10 @@ void GaussElimi(){
         }
         Data[i][i] = 1.0;
         for (int j = i+1; j <= n-1; ++j) {
-            vaji = vldlq_dup_f32(Data[j]+i);
+            vaji = vld1q_dup_f32(Data[j]+i);
             for (int k = i+1; k+4 <= n-1 ; k+=4) {
-                vaik = vldlq_f32(Data[i]+k);
-                vajk = vldlq_f32(Data[j]+k);
+                vaik = vld1q_f32(Data[i]+k);
+                vajk = vld1q_f32(Data[j]+k);
                 vx = vmulq_f32(vaik,vaji);
                 vajk = vsubq_f32(vajk,vx);
                 vst1q_f32(Data[j]+k,vajk);
