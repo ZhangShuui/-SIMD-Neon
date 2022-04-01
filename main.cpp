@@ -29,8 +29,6 @@ void GaussElimi(){
 
         }
         Data[i][i] = 1.0;
-    }
-    Data[i][i] = 1.0;
     for (int j = i+1; j <= n-1; ++j) {
         vaji = vld1q_dup_f32(Data[j]+i);
         for (int k = i+1; k+4 <= n-1 ; k+=4) {
